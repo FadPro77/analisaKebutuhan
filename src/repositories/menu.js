@@ -17,7 +17,7 @@ exports.getMenu = async (nama, harga, kategori, ketersediaan) => {
 
   if (harga) {
     orQuery.push({
-      harga: { contains: harga, mode: "insensitive" },
+      harga: Number(harga),
     });
   }
 
@@ -64,23 +64,27 @@ exports.createMenu = async (data) => {
   return JSONBigInt.parse(serializedMenus);
 };
 
-exports.updateSpec = async (id, data) => {
-  const updatedSpec = await prisma.specs.update({
+exports.updateMenu = async (id, data) => {
+  const updatedMenu = await prisma.menu.update({
     where: {
       id: Number(id),
     },
     data: {
-      spec_name: data.spec_name,
+      nama: data.nama,
+      harga: data.harga,
+      kategori: data.kategori,
+      ketersediaan: data.ketersediaan,
+      image: data.image,
     },
   });
 
-  const serializedSpecs = JSONBigInt.stringify(updatedSpec);
-  return JSONBigInt.parse(serializedSpecs);
+  const serializedMenu = JSONBigInt.stringify(updatedMenu);
+  return JSONBigInt.parse(serializedMenu);
 };
 
-exports.deleteSpecById = async (id) => {
-  const deletedSpec = await prisma.specs.delete({
+exports.deleteMenu = async (id) => {
+  const deletedMenu = await prisma.menu.delete({
     where: { id: Number(id) },
   });
-  return deletedSpec;
+  return deletedMenu;
 };

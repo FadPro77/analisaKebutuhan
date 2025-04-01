@@ -3,8 +3,16 @@ const {
   validateGetMenu,
   validateGetMenuById,
   validateCreateMenu,
+  validateUpdateMenu,
+  validateDeleteMenu,
 } = require("../middlewares/menu");
-const { getMenu, getMenuById, createMenu } = require("../controllers/menu");
+const {
+  getMenu,
+  getMenuById,
+  createMenu,
+  updateMenu,
+  deleteMenu,
+} = require("../controllers/menu");
 const { authorization } = require("../middlewares/auth");
 const { adminRole } = require("../constant/auth");
 
@@ -16,6 +24,10 @@ router
   .get(validateGetMenu, getMenu)
   .post(validateCreateMenu, createMenu);
 
-router.route("/:id").get(validateGetMenuById, getMenuById);
+router
+  .route("/:id")
+  .get(validateGetMenuById, getMenuById)
+  .put(validateUpdateMenu, authorization(adminRole), updateMenu)
+  .delete(validateDeleteMenu, authorization(adminRole), deleteMenu);
 
 module.exports = router;

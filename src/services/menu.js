@@ -25,39 +25,45 @@ exports.getMenuById = async (id) => {
   return menu;
 };
 
-exports.createMenu = async (data) => {
+exports.createMenu = async (data, file) => {
+  if (file?.image) {
+    data.image = await imageUpload(file.image);
+  }
   return menuRepository.createMenu(data);
 };
 
-exports.updateSpec = async (id, data, file) => {
-  const existingSpec = specRepository.getSpecById(id);
-  if (!existingSpec) {
-    throw new NotFoundError("Spec is Not Found!");
+exports.updateMenu = async (id, data, file) => {
+  const existingMenu = await menuRepository.getMenuById(id);
+  if (!existingMenu) {
+    throw new NotFoundError("Menu is Not Found!");
   }
 
   data = {
-    ...existingSpec,
+    ...existingMenu,
     ...data,
   };
-
-  const updatedSpec = specRepository.updateSpec(id, data);
-  if (!updatedSpec) {
-    throw new InternalServerError(["Failed to update spec!"]);
+  if (file?.image) {
+    data.image = await imageUpload(file.image);
   }
 
-  return updatedSpec;
+  const updatedMenu = await menuRepository.updateMenu(id, data);
+  if (!updatedMenu) {
+    throw new InternalServerError(["Failed to update menu!"]);
+  }
+
+  return updatedMenu;
 };
 
-exports.deleteSpecById = async (id) => {
-  const existingSpec = await specRepository.getSpecById(id);
-  if (!existingSpec) {
-    throw new NotFoundError("Spec is Not Found!");
+exports.deleteMenu = async (id) => {
+  const existingMenu = await menuRepository.getMenuById(id);
+  if (!existingMenu) {
+    throw new NotFoundError("Menu is Not Found!");
   }
 
-  const deletedSpec = await specRepository.deleteSpecById(id);
-  if (!deletedSpec) {
+  const deletedMenu = await menuRepository.deleteMenu(id);
+  if (!deletedMenu) {
     throw new InternalServerError(["Failed to delete spec!"]);
   }
 
-  return existingSpec;
+  return existingMenu;
 };

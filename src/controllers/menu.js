@@ -24,21 +24,21 @@ exports.createMenu = async (req, res, next) => {
   });
 };
 
-exports.updateManufacture = async (req, res, next) => {
-  const id = req.params.id;
+exports.updateMenu = async (req, res, next) => {
+  const { id } = req.params;
 
-  const data = await manufactureService.updateManufacture(id, req.body);
+  const data = await menuService.updateMenu(id, req.body, req.files);
   successResponse(res, {
-    message: "Manufacture Updated successfully!",
+    message: "Menu Updated successfully!",
     data,
   });
 };
 
-exports.deleteManufactureById = async (req, res, next) => {
-  const data = await manufactureService.deleteManufactureById(req.params.id);
+exports.deleteMenu = async (req, res, next) => {
+  const data = await menuService.deleteMenu(req.params.id);
 
   successResponse(res, {
-    message: "Manufacture Deleted successfully!",
+    message: "Menu Deleted successfully!",
     data,
   });
 };

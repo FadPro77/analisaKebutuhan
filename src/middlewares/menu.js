@@ -35,11 +35,27 @@ exports.validateCreateMenu = (req, res, next) => {
     ketersediaan: z.boolean().optional(),
   });
 
+  const validateFileBody = z
+    .object({
+      image: z
+        .object({
+          name: z.string(),
+          data: z.any(),
+        })
+        .nullable()
+        .optional(),
+    })
+    .nullable()
+    .optional();
+
   try {
     const validatedData = validateBody.parse(req.body);
-
     if (validatedData.ketersediaan === undefined) {
       validatedData.ketersediaan = true;
+    }
+    const resultvalidateFileBody = validateFileBody.safeParse(req.files);
+    if (!resultvalidateFileBody.success) {
+      throw new BadRequestError(resultvalidateFileBody.error.errors);
     }
 
     req.body = validatedData;
@@ -52,29 +68,54 @@ exports.validateCreateMenu = (req, res, next) => {
   next();
 };
 
-exports.validateUpdateSpec = (req, res, next) => {
-  const validateParams = z.object({
-    id: z.string(),
-  });
-
-  const resultValidateParams = validateParams.safeParse(req.params);
-  if (!resultValidateParams.success) {
-    throw new BadRequestError(resultValidateParams.error.errors);
-  }
-
+exports.validateUpdateMenu = (req, res, next) => {
   const validateBody = z.object({
-    spec_name: z.string(),
+    nama: z.string().min(1, "Nama menu tidak boleh kosong").optional(),
+    harga: z.coerce
+      .number()
+      .positive()
+      .min(1, "Harga tidak boleh kosong")
+      .optional(),
+    kategori: z.string().min(1, "Nama kategori tidak boleh kosong").optional(),
+    ketersediaan: z.boolean().optional(),
   });
 
-  const resultValidateBody = validateBody.safeParse(req.body);
-  if (!resultValidateBody.success) {
-    throw new BadRequestError(resultValidateBody.error.errors);
+  const validateFileBody = z
+    .object({
+      image: z
+        .object({
+          name: z.string(),
+          data: z.any(),
+        })
+        .nullable()
+        .optional(),
+    })
+    .nullable()
+    .optional();
+
+  try {
+    const validatedData = validateBody.parse(req.body);
+
+    if (validatedData.ketersediaan === undefined) {
+      validatedData.ketersediaan = true;
+    }
+
+    const resultvalidateFileBody = validateFileBody.safeParse(req.files);
+    if (!resultvalidateFileBody.success) {
+      throw new BadRequestError(resultvalidateFileBody.error.errors);
+    }
+
+    req.body = validatedData;
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Invalid data", errors: error.errors });
   }
 
   next();
 };
 
-exports.validateDeleteSpecById = (req, res, next) => {
+exports.validateDeleteMenu = (req, res, next) => {
   const validateParams = z.object({
     id: z.string(),
   });
