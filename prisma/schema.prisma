@@ -26,7 +26,8 @@ model menu {
   nama          String          @db.VarChar
   harga         Float
   kategori      String          @db.VarChar
-  ketersediaan  Boolean
+  ketersediaan  Boolean         @default(true)
+  image         String           @default("")
   keranjang     keranjang[]
   pesanan_items pesanan_items[]
 }
