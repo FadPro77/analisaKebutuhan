@@ -48,6 +48,10 @@ exports.getPesanan = async (status, user_id, created_at) => {
     };
   }
 
+  if (user_id) {
+    query.where = { ...query.where, user_id: parseInt(user_id) };
+  }
+
   const searchedPesanan = await prisma.pesanan.findMany(query);
 
   const serializedPesanan = JSONBigInt.stringify(searchedPesanan);

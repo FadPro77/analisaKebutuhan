@@ -29,11 +29,6 @@ exports.validateGetPesananById = (req, res, next) => {
 
 exports.validateCreatePesanan = (req, res, next) => {
   const validateBody = z.object({
-    user_id: z.coerce
-      .number()
-      .int()
-      .positive("User ID harus berupa angka positif"),
-
     menu_id: z.coerce
       .number()
       .int()
@@ -46,19 +41,22 @@ exports.validateCreatePesanan = (req, res, next) => {
     // Validasi request body
     const validatedData = validateBody.parse(req.body);
 
+    // Pastikan req.user ada sebelum mengakses ID
+    if (!req.user || !req.user.id) {
+      throw new BadRequestError("User harus login untuk membuat pesanan.");
+    }
+
     // Konversi request agar sesuai dengan skema database
     req.body = {
-      user_id: validatedData.user_id,
+      user_id: req.user.id, // Otomatis diambil dari req.user
       status: "pending",
-      pesanan_items: validatedData.menu_id
-        ? [
-            {
-              menu_id: validatedData.menu_id,
-              jumlah: validatedData.jumlah,
-              subtotal: 0, // Tambahkan subtotal default agar tidak undefined
-            },
-          ]
-        : [],
+      pesanan_items: [
+        {
+          menu_id: validatedData.menu_id,
+          jumlah: validatedData.jumlah,
+          subtotal: 0, // Tambahkan subtotal default agar tidak undefined
+        },
+      ],
     };
   } catch (error) {
     return res

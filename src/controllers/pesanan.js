@@ -2,12 +2,7 @@ const { successResponse } = require("../utils/response");
 const pesananService = require("../services/pesanan");
 
 exports.getPesanan = async (req, res, next) => {
-  const data = await pesananService
-    .getPesanan
-    // req.query?.nama,
-    // req.query?.harga,
-    // req.query?.kategori
-    ();
+  const data = await pesananService.getPesanan();
 
   successResponse(res, data);
 };
