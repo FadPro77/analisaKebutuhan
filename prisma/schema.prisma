@@ -7,20 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model keranjang {
-  id         Int       @id @default(autoincrement())
-  user_id    Int
-  pesanan_id Int?
-  menu_id    Int
-  jumlah     Int       @default(1)
-  subtotal   Float
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  menu       menu      @relation(fields: [menu_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  pesanan    pesanan?  @relation(fields: [pesanan_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model menu {
   id            Int             @id @default(autoincrement())
   nama          String          @db.VarChar
@@ -28,11 +14,9 @@ model menu {
   kategori      String          @db.VarChar
   ketersediaan  Boolean         @default(true)
   image         String           @default("")
-  keranjang     keranjang[]
   pesanan_items pesanan_items[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model payment {
   id           Int       @id @default(autoincrement())
   pesanan_id   Int       @unique
@@ -44,13 +28,11 @@ model payment {
   pesanan      pesanan   @relation(fields: [pesanan_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model pesanan {
   id            Int             @id @default(autoincrement())
   status        String          @db.VarChar
   user_id       Int
   created_at    DateTime?       @default(now()) @db.Timestamp(6)
-  keranjang     keranjang[]
   payment       payment?
   users         users           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   pesanan_items pesanan_items[]
@@ -67,7 +49,6 @@ model pesanan_items {
   pesanan    pesanan @relation(fields: [pesanan_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model saldo {
   id         Int       @id @default(autoincrement())
   tipe       String    @db.VarChar
@@ -78,7 +59,6 @@ model saldo {
   pesanan    pesanan?  @relation(fields: [pesanan_id], references: [id], onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model users {
   id         Int         @id @default(autoincrement())
   first_name String      @db.VarChar
@@ -87,6 +67,5 @@ model users {
   phone      String      @db.VarChar
   email      String  @unique(map: "users_email_idx") @db.VarChar
   role_id    Int     @default(2)
-  keranjang  keranjang[]
   pesanan    pesanan[]
 }
