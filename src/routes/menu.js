@@ -22,7 +22,7 @@ const router = express.Router();
 router
   .route("/")
   .get(validateGetMenu, getMenu)
-  .post(validateCreateMenu, createMenu);
+  .post(authorization(adminRole), validateCreateMenu, createMenu);
 
 router
   .route("/:id")
