@@ -1,5 +1,7 @@
 const { z } = require("zod");
-const { BadRequestError } = require("../utils/request");
+const { BadRequestError, Forbidden } = require("../utils/request");
+const { Prisma } = require("@prisma/client");
+const { adminRole } = require("../constant/auth");
 
 exports.validateGetPesanan = (req, res, next) => {
   const validateQuery = z.object({
@@ -38,23 +40,20 @@ exports.validateCreatePesanan = (req, res, next) => {
   });
 
   try {
-    // Validasi request body
     const validatedData = validateBody.parse(req.body);
 
-    // Pastikan req.user ada sebelum mengakses ID
     if (!req.user || !req.user.id) {
       throw new BadRequestError("User harus login untuk membuat pesanan.");
     }
 
-    // Konversi request agar sesuai dengan skema database
     req.body = {
-      user_id: req.user.id, // Otomatis diambil dari req.user
+      user_id: req.user.id,
       status: "pending",
       pesanan_items: [
         {
           menu_id: validatedData.menu_id,
           jumlah: validatedData.jumlah,
-          subtotal: 0, // Tambahkan subtotal default agar tidak undefined
+          subtotal: 0,
         },
       ],
     };
@@ -62,6 +61,35 @@ exports.validateCreatePesanan = (req, res, next) => {
     return res
       .status(400)
       .json({ message: "Invalid data", errors: error.errors });
+  }
+
+  next();
+};
+
+exports.validatePatchPesanan = (req, res, next) => {
+  const schema = z.object({
+    status: z
+      .string()
+      .min(1, "Status pesanan harus berupa string dan tidak boleh kosong."),
+  });
+
+  const result = schema.safeParse(req.body);
+
+  if (!result.success) {
+    throw new BadRequestError("Validation failed!", result.error.errors);
+  }
+
+  next();
+};
+
+exports.validateDeletePesanan = (req, res, next) => {
+  const validateParams = z.object({
+    id: z.string(),
+  });
+
+  const result = validateParams.safeParse(req.params);
+  if (!result.success) {
+    throw new BadRequestError(result.error.errors);
   }
 
   next();

@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
 const prisma = new PrismaClient();
 
-exports.getPesanan = async (status, user_id, created_at) => {
+exports.getPesanan = async (status, created_at, user_id) => {
   let query = {
     include: {
       users: {
@@ -28,34 +28,24 @@ exports.getPesanan = async (status, user_id, created_at) => {
     },
   };
 
-  let orQuery = [];
+  if (user_id) {
+    query.where = { user_id };
+  }
+
   if (status) {
-    orQuery.push({
-      status: { contains: status, mode: "insensitive" },
-    });
+    query.where.status = { contains: status, mode: "insensitive" };
   }
 
   if (created_at) {
-    orQuery.push({
-      created_at: { contains: created_at, mode: "insensitive" },
-    });
-  }
-
-  if (orQuery.length > 0) {
-    query.where = {
-      ...query.where,
-      OR: orQuery,
-    };
-  }
-
-  if (user_id) {
-    query.where = { ...query.where, user_id: parseInt(user_id) };
+    const dateFilter = new Date(created_at);
+    if (!isNaN(dateFilter.getTime())) {
+      query.where.created_at = { gte: dateFilter };
+    }
   }
 
   const searchedPesanan = await prisma.pesanan.findMany(query);
 
-  const serializedPesanan = JSONBigInt.stringify(searchedPesanan);
-  return JSONBigInt.parse(serializedPesanan);
+  return JSONBigInt.parse(JSONBigInt.stringify(searchedPesanan));
 };
 
 exports.getPesananById = async (id) => {
@@ -71,6 +61,8 @@ exports.getPesananById = async (id) => {
       },
       pesanan_items: {
         select: {
+          jumlah: true,
+          subtotal: true,
           menu: {
             select: {
               nama: true,
@@ -79,8 +71,6 @@ exports.getPesananById = async (id) => {
             },
           },
         },
-        jumlah: true,
-        subtotal: true,
       },
     },
   });
@@ -94,7 +84,7 @@ exports.createPesanan = async (userId, items) => {
     items.map(async (item) => {
       const menu = await prisma.menu.findUnique({
         where: { id: item.menu_id },
-        select: { harga: true }, // Ambil harga dari database
+        select: { harga: true },
       });
 
       if (!menu) {
@@ -104,7 +94,7 @@ exports.createPesanan = async (userId, items) => {
       return {
         menu_id: item.menu_id,
         jumlah: item.jumlah,
-        subtotal: item.jumlah * menu.harga, // Hitung subtotal dengan harga dari DB
+        subtotal: item.jumlah * menu.harga,
       };
     })
   );
@@ -119,4 +109,54 @@ exports.createPesanan = async (userId, items) => {
   });
 
   return newPesanan;
+};
+
+exports.patchPesanan = async (pesananId, status) => {
+  const existingPesanan = await prisma.pesanan.findUnique({
+    where: { id: Number(pesananId) },
+  });
+
+  if (!existingPesanan) {
+    throw new error(`pesanan ${pesananId} tidak ditemukan`);
+  }
+
+  const patchedPesanan = await prisma.pesanan.update({
+    where: { id: Number(pesananId) },
+    data: { status },
+  });
+
+  return patchedPesanan;
+};
+
+exports.getPesananAdmin = async (status, created_at, user_id) => {
+  const whereClause = {};
+
+  // Filter opsional untuk admin
+  if (user_id) whereClause.user_id = user_id;
+  if (status) whereClause.status = { contains: status, mode: "insensitive" };
+  if (created_at) {
+    const date = new Date(created_at);
+    if (!isNaN(date)) whereClause.created_at = { gte: date };
+  }
+
+  return await prisma.pesanan.findMany({
+    where: whereClause,
+    include: {
+      users: { select: { first_name: true, last_name: true, phone: true } },
+      pesanan_items: {
+        select: {
+          jumlah: true,
+          subtotal: true,
+          menu: { select: { nama: true, kategori: true, image: true } },
+        },
+      },
+    },
+  });
+};
+
+exports.deletePesanan = async (id) => {
+  const deletedPesanan = await prisma.pesanan.delete({
+    where: { id: Number(id) },
+  });
+  return deletedPesanan;
 };
