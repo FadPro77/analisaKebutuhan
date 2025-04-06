@@ -1,4 +1,4 @@
-const { snap } = require("../utils/midtrans");
+const midtransClient = require("midtrans-client");
 
 if (!process.env.MIDTRANS_SERVER_KEY || !process.env.MIDTRANS_CLIENT_KEY) {
   throw new Error(
@@ -6,7 +6,7 @@ if (!process.env.MIDTRANS_SERVER_KEY || !process.env.MIDTRANS_CLIENT_KEY) {
   );
 }
 
-export const snap = new midtransClient.Snap({
+exports.snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,

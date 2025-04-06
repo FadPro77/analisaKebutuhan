@@ -11,7 +11,10 @@ const {
   getPaymentById,
   createPaymentManual,
   createPaymentMidtrans,
+  handleMidtransNotification,
 } = require("../controllers/payment");
+
+const { createMidtransNotification } = require("../services/payment");
 
 const { authorization } = require("../middlewares/auth");
 const { adminRole, userRole } = require("../constant/auth");
@@ -30,7 +33,7 @@ router
 router
   .route("/:id")
   .get(
-    authorization(adminRole.userRole),
+    authorization(adminRole, userRole),
     validateGetPaymentById,
     getPaymentById
   );
@@ -41,6 +44,14 @@ router
     authorization(adminRole, userRole),
     validateCreatePaymentMidtrans,
     createPaymentMidtrans
+  );
+
+router
+  .route("/midtrans/notification")
+  .post(
+    authorization(adminRole, userRole),
+    handleMidtransNotification,
+    createMidtransNotification
   );
 
 module.exports = router;

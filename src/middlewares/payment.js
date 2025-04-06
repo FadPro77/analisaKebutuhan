@@ -36,8 +36,6 @@ exports.validateCreatePaymentManual = (req, res, next) => {
       .positive()
       .min(1, "Pesanan tidak boleh kosong"),
     status: z.string().min(1, "status pembayaran tidak boleh kosong"),
-    transaksi_id: z.string().min(1, "Pesanan tidak boleh kosong"),
-    jumlah: z.coerce.number().positive().min(1, "Pesanan tidak boleh kosong"),
   });
 
   const resultValidateBody = validateBody.safeParse(req.body);
@@ -55,19 +53,6 @@ exports.validateCreatePaymentMidtrans = (req, res, next) => {
       .number()
       .positive("Pesanan ID harus berupa angka positif")
       .min(1, "Pesanan ID tidak boleh kosong"),
-    jumlah: z.coerce
-      .number()
-      .positive("Jumlah harus berupa angka positif")
-      .min(1, "Jumlah pembayaran tidak boleh kosong"),
-    user: z.object({
-      first_name: z.string().min(1, "Nama depan tidak boleh kosong"),
-      last_name: z.string().optional(),
-      email: z.string().email("Email tidak valid"),
-      phone: z
-        .string()
-        .min(8, "Nomor telepon tidak boleh kosong")
-        .regex(/^[0-9+]+$/, "Nomor telepon tidak valid"),
-    }),
   });
 
   const resultValidateBody = validateBody.safeParse(req.body);
