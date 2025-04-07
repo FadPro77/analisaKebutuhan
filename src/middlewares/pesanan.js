@@ -30,17 +30,20 @@ exports.validateGetPesananById = (req, res, next) => {
 };
 
 exports.validateCreatePesanan = (req, res, next) => {
-  const validateBody = z.object({
+  const itemSchema = z.object({
     menu_id: z.coerce
       .number()
       .int()
       .positive("Menu ID harus berupa angka positif"),
-
     jumlah: z.coerce.number().int().positive("Jumlah harus angka positif"),
   });
 
+  const validateBody = z.object({
+    pesanan_items: z.array(itemSchema).min(1, "Minimal 1 item harus dipesan"),
+  });
+
   try {
-    const validatedData = validateBody.parse(req.body);
+    const result = validateBody.parse(req.body);
 
     if (!req.user || !req.user.id) {
       throw new BadRequestError("User harus login untuk membuat pesanan.");
@@ -49,21 +52,18 @@ exports.validateCreatePesanan = (req, res, next) => {
     req.body = {
       user_id: req.user.id,
       status: "pending",
-      pesanan_items: [
-        {
-          menu_id: validatedData.menu_id,
-          jumlah: validatedData.jumlah,
-          subtotal: 0,
-        },
-      ],
+      pesanan_items: result.pesanan_items.map((item) => ({
+        ...item,
+        subtotal: 0, // akan dihitung di repository
+      })),
     };
+
+    next();
   } catch (error) {
     return res
       .status(400)
       .json({ message: "Invalid data", errors: error.errors });
   }
-
-  next();
 };
 
 exports.validatePatchPesanan = (req, res, next) => {
