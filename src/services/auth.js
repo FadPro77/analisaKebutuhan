@@ -49,7 +49,7 @@ const createToken = (user) => {
     user_id: user.id,
   };
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "72h", // expired in 3 days
+    expiresIn: "14h",
   });
 
   return token;
