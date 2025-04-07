@@ -62,7 +62,7 @@ exports.deleteMenu = async (id) => {
 
   const deletedMenu = await menuRepository.deleteMenu(id);
   if (!deletedMenu) {
-    throw new InternalServerError(["Failed to delete spec!"]);
+    throw new InternalServerError(["Failed to delete menu!"]);
   }
 
   return existingMenu;
