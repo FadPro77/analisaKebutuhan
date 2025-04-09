@@ -85,7 +85,6 @@
 
 ## Link
 
-- **Dokumentasi**
 - **[Deployed API](https://analisakebutuhan-production.up.railway.app)**
 - **[POSTMAN API Client](https://documenter.getpostman.com/view/38244782/2sB2cX8gH2)**
 - **[GitHub Repository](https://github.com/FadPro77/analisaKebutuhan)**
