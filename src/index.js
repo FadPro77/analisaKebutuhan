@@ -7,7 +7,7 @@ const router = require("../src/routes");
 const {
   notFoundURLHandler,
   errorHandler,
-} = require("../src/middlewares/errorhandler");
+} = require("../src/middlewares/errorHandler");
 
 const app = express();
 const port = process.env.PORT || 4100;
