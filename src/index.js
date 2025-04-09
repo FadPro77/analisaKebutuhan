@@ -3,10 +3,11 @@ const express = require("express");
 require("express-async-errors");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
-const router = require("../src/routes");
+const router = require("../src/routes/index");
 const {
   notFoundURLHandler,
   errorHandler,
+} = require("../src/middlewares/errorHandler");
 } = require("../src/middlewares/errorHandler");
 
 const app = express();
