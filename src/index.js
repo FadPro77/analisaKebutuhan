@@ -8,7 +8,6 @@ const {
   notFoundURLHandler,
   errorHandler,
 } = require("../src/middlewares/errorHandler");
-} = require("../src/middlewares/errorHandler");
 
 const app = express();
 const port = process.env.PORT || 4100;
