@@ -3,11 +3,11 @@ const express = require("express");
 require("express-async-errors");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
-const router = require("./routes");
+const router = require("../src/routes");
 const {
   notFoundURLHandler,
   errorHandler,
-} = require("./middlewares/errorhandler");
+} = require("../src/middlewares/errorhandler");
 
 const app = express();
 const port = process.env.PORT || 4100;
