@@ -6,6 +6,7 @@ const pesananRouter = require("./pesanan");
 const paymentRouter = require("./payment");
 const pengeluaranRouter = require("./pengeluaran");
 const saldoRouter = require("./saldo");
+const userRouter = require("./user");
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.use("/pesanan", pesananRouter);
 router.use("/payment", paymentRouter);
 router.use("/pengeluaran", pengeluaranRouter);
 router.use("/saldo", saldoRouter);
+router.use("/user", userRouter);
 
 module.exports = router;

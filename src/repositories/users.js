@@ -75,3 +75,46 @@ exports.googleLogin = async (accessToken) => {
   );
   return response?.data;
 };
+
+exports.getUser = async (first_name, last_name, email, phone) => {
+  let query = {
+    where: {},
+  };
+
+  let orQuery = [];
+  if (first_name) {
+    orQuery.push({
+      first_name: { contains: first_name, mode: "insensitive" },
+    });
+  }
+
+  if (last_name) {
+    orQuery.push({
+      last_name: { contains: last_name, mode: "insensitive" },
+    });
+  }
+
+  if (email) {
+    orQuery.push({
+      email: { contains: email, mode: "insensitive" },
+    });
+  }
+
+  if (phone) {
+    orQuery.push({
+      phone: { contains: phone, mode: "insensitive" },
+    });
+  }
+
+  if (orQuery.length > 0) {
+    query.where = {
+      ...query.where,
+      OR: orQuery,
+    };
+  }
+
+  const searchedUser = await prisma.users.findMany(query);
+
+  const serializedUser = JSONBigInt.stringify(searchedUser);
+  return JSONBigInt.parse(serializedUser);
+};
