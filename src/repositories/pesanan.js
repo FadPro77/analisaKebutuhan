@@ -10,6 +10,7 @@ exports.getPesanan = async (status, created_at, user_id) => {
           first_name: true,
           last_name: true,
           phone: true,
+          email: true,
         },
       },
       pesanan_items: {
@@ -142,7 +143,9 @@ exports.getPesananAdmin = async (status, created_at, user_id) => {
   return await prisma.pesanan.findMany({
     where: whereClause,
     include: {
-      users: { select: { first_name: true, last_name: true, phone: true } },
+      users: {
+        select: { first_name: true, last_name: true, phone: true, email: true },
+      },
       pesanan_items: {
         select: {
           jumlah: true,
