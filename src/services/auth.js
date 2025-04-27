@@ -61,23 +61,27 @@ exports.googleLogin = async (accessToken) => {
     accessToken
   );
 
-  // check is user already have an account
+  // Split the full name into first_name and last_name
+  const [first_name, ...rest] = name.trim().split(" ");
+  const last_name = rest.join(" ") || "-";
+
+  // check if user already has an account
   let user = await userRepository.getUserByEmail(email);
   if (!user) {
     // register the user
     user = await userRepository.createUser({
       first_name,
       last_name,
-      phone,
+      phone: "", // kosong karena google tidak kasih nomor telepon
       email,
-      password: "",
+      password: "", // karena Google login, tidak perlu password
     });
   }
 
   // create the token
   const token = createToken(user);
 
-  // don't forget to remove the password object, if not removed it will be displayed in response
+  // remove password before sending user data
   delete user.password;
 
   return { user, token };
