@@ -32,7 +32,13 @@ exports.validateCreateMenu = (req, res, next) => {
     nama: z.string().min(1, "Nama menu tidak boleh kosong"),
     harga: z.coerce.number().positive().min(1, "Harga tidak boleh kosong"),
     kategori: z.string().min(1, "Nama kategori tidak boleh kosong"),
-    ketersediaan: z.boolean().optional(),
+    ketersediaan: z
+      .union([z.string(), z.boolean()])
+      .transform((val) => {
+        if (typeof val === "string") return val === "true";
+        return val;
+      })
+      .optional(),
   });
 
   const validateFileBody = z
@@ -77,7 +83,13 @@ exports.validateUpdateMenu = (req, res, next) => {
       .min(1, "Harga tidak boleh kosong")
       .optional(),
     kategori: z.string().min(1, "Nama kategori tidak boleh kosong").optional(),
-    ketersediaan: z.boolean().optional(),
+    ketersediaan: z
+      .union([z.string(), z.boolean()])
+      .transform((val) => {
+        if (typeof val === "string") return val === "true";
+        return val;
+      })
+      .optional(),
   });
 
   const validateFileBody = z
