@@ -26,7 +26,7 @@ router
 router
   .route("/:id")
   .get(validateGetMenuById, getMenuById)
-  .put(validateUpdateMenu, authorization(adminRole), updateMenu)
-  .delete(validateDeleteMenu, authorization(adminRole), deleteMenu);
+  .put(authorization(adminRole), validateUpdateMenu, updateMenu)
+  .delete(authorization(adminRole), validateDeleteMenu, deleteMenu);
 
 module.exports = router;
