@@ -59,13 +59,22 @@ exports.patchPesanan = async (req, res, next) => {
 
 exports.getPesananAdmin = async (req, res, next) => {
   const { status, created_at, user_id } = req.query;
+  const location_id = req.user.location_id;
 
   try {
     const data = await pesananService.getPesananAdmin(
       status,
       created_at,
-      user_id ? Number(user_id) : undefined
+      user_id ? Number(user_id) : undefined,
+      location_id
     );
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tidak ada pesanan pada lokasi anda",
+      });
+    }
 
     successResponse(res, data);
   } catch (error) {

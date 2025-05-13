@@ -35,10 +35,17 @@ exports.validateCreatePesanan = (req, res, next) => {
       .number()
       .int()
       .positive("Menu ID harus berupa angka positif"),
-    jumlah: z.coerce.number().int().positive("Jumlah harus angka positif"),
+    jumlah: z.coerce
+      .number()
+      .int()
+      .positive("Jumlah harus berupa angka positif"),
   });
 
   const validateBody = z.object({
+    location_id: z.coerce
+      .number()
+      .int()
+      .positive("Location ID harus berupa angka positif"),
     pesanan_items: z.array(itemSchema).min(1, "Minimal 1 item harus dipesan"),
   });
 
@@ -51,11 +58,8 @@ exports.validateCreatePesanan = (req, res, next) => {
 
     req.body = {
       user_id: req.user.id,
-      status: "pending",
-      pesanan_items: result.pesanan_items.map((item) => ({
-        ...item,
-        subtotal: 0, // akan dihitung di repository
-      })),
+      location_id: result.location_id,
+      pesanan_items: result.pesanan_items,
     };
 
     next();
