@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
 const prisma = new PrismaClient();
 
-exports.getPesanan = async (status, created_at, user_id) => {
+exports.getPesanan = async (status, created_at, user_id, location_id) => {
   let query = {
     include: {
       users: {
@@ -11,6 +11,11 @@ exports.getPesanan = async (status, created_at, user_id) => {
           last_name: true,
           phone: true,
           email: true,
+        },
+      },
+      location: {
+        select: {
+          address: true,
         },
       },
       pesanan_items: {
@@ -44,6 +49,10 @@ exports.getPesanan = async (status, created_at, user_id) => {
     }
   }
 
+  if (location_id) {
+    query.where = { location_id };
+  }
+
   const searchedPesanan = await prisma.pesanan.findMany(query);
 
   return JSONBigInt.parse(JSONBigInt.stringify(searchedPesanan));
@@ -58,6 +67,11 @@ exports.getPesananById = async (id) => {
           first_name: true,
           last_name: true,
           phone: true,
+        },
+      },
+      location: {
+        select: {
+          address: true,
         },
       },
       pesanan_items: {
@@ -80,7 +94,7 @@ exports.getPesananById = async (id) => {
   return JSONBigInt.parse(serializedPesanan);
 };
 
-exports.createPesanan = async (userId, items) => {
+exports.createPesanan = async (userId, locationId, items) => {
   const pesananItemsData = await Promise.all(
     items.map(async (item) => {
       const menu = await prisma.menu.findUnique({
@@ -100,10 +114,21 @@ exports.createPesanan = async (userId, items) => {
     })
   );
 
+  // Validasi location_id
+  const location = await prisma.location.findUnique({
+    where: { id: locationId },
+    select: { id: true },
+  });
+
+  if (!location) {
+    throw new Error(`Lokasi dengan id ${locationId} tidak ditemukan`);
+  }
+
   const newPesanan = await prisma.pesanan.create({
     data: {
       user_id: userId,
       status: "pending",
+      location_id: locationId,
       pesanan_items: { create: pesananItemsData },
     },
     include: { pesanan_items: true },
@@ -129,10 +154,11 @@ exports.patchPesanan = async (pesananId, status) => {
   return patchedPesanan;
 };
 
-exports.getPesananAdmin = async (status, created_at, user_id) => {
-  const whereClause = {};
+exports.getPesananAdmin = async (status, created_at, user_id, location_id) => {
+  const whereClause = {
+    location_id,
+  };
 
-  // Filter opsional untuk admin
   if (user_id) whereClause.user_id = user_id;
   if (status) whereClause.status = { contains: status, mode: "insensitive" };
   if (created_at) {
@@ -145,6 +171,9 @@ exports.getPesananAdmin = async (status, created_at, user_id) => {
     include: {
       users: {
         select: { first_name: true, last_name: true, phone: true, email: true },
+      },
+      location: {
+        select: { address: true },
       },
       pesanan_items: {
         select: {
