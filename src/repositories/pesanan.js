@@ -2,7 +2,13 @@ const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
 const prisma = new PrismaClient();
 
-exports.getPesanan = async (status, created_at, user_id, location_id) => {
+exports.getPesanan = async (
+  status,
+  created_at,
+  user_id,
+  location_id,
+  address
+) => {
   let query = {
     include: {
       users: {
@@ -40,6 +46,10 @@ exports.getPesanan = async (status, created_at, user_id, location_id) => {
 
   if (status) {
     query.where.status = { contains: status, mode: "insensitive" };
+  }
+
+  if (address) {
+    query.where.address = { contains: address, mode: "insensitive" };
   }
 
   if (created_at) {
@@ -94,7 +104,7 @@ exports.getPesananById = async (id) => {
   return JSONBigInt.parse(serializedPesanan);
 };
 
-exports.createPesanan = async (userId, locationId, items) => {
+exports.createPesanan = async (userId, locationId, items, address) => {
   const pesananItemsData = await Promise.all(
     items.map(async (item) => {
       const menu = await prisma.menu.findUnique({
@@ -130,6 +140,7 @@ exports.createPesanan = async (userId, locationId, items) => {
       status: "pending",
       location_id: locationId,
       pesanan_items: { create: pesananItemsData },
+      address: address ?? null,
     },
     include: { pesanan_items: true },
   });

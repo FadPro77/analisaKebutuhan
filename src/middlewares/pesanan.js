@@ -47,6 +47,7 @@ exports.validateCreatePesanan = (req, res, next) => {
       .int()
       .positive("Location ID harus berupa angka positif"),
     pesanan_items: z.array(itemSchema).min(1, "Minimal 1 item harus dipesan"),
+    address: z.string().optional(),
   });
 
   try {
@@ -60,6 +61,7 @@ exports.validateCreatePesanan = (req, res, next) => {
       user_id: req.user.id,
       location_id: result.location_id,
       pesanan_items: result.pesanan_items,
+      address: result.address,
     };
 
     next();
