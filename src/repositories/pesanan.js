@@ -2,7 +2,13 @@ const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
 const prisma = new PrismaClient();
 
-exports.getPesanan = async (status, created_at, user_id, location_id) => {
+exports.getPesanan = async (
+  status,
+  created_at,
+  user_id,
+  location_id,
+  address
+) => {
   let query = {
     include: {
       users: {
@@ -11,6 +17,11 @@ exports.getPesanan = async (status, created_at, user_id, location_id) => {
           last_name: true,
           phone: true,
           email: true,
+        },
+      },
+      location: {
+        select: {
+          address: true,
         },
       },
       location: {
@@ -42,11 +53,19 @@ exports.getPesanan = async (status, created_at, user_id, location_id) => {
     query.where.status = { contains: status, mode: "insensitive" };
   }
 
+  if (address) {
+    query.where.address = { contains: address, mode: "insensitive" };
+  }
+
   if (created_at) {
     const dateFilter = new Date(created_at);
     if (!isNaN(dateFilter.getTime())) {
       query.where.created_at = { gte: dateFilter };
     }
+  }
+
+  if (location_id) {
+    query.where = { location_id };
   }
 
   if (location_id) {
@@ -74,6 +93,11 @@ exports.getPesananById = async (id) => {
           address: true,
         },
       },
+      location: {
+        select: {
+          address: true,
+        },
+      },
       pesanan_items: {
         select: {
           jumlah: true,
@@ -94,7 +118,7 @@ exports.getPesananById = async (id) => {
   return JSONBigInt.parse(serializedPesanan);
 };
 
-exports.createPesanan = async (userId, locationId, items) => {
+exports.createPesanan = async (userId, locationId, items, address) => {
   const pesananItemsData = await Promise.all(
     items.map(async (item) => {
       const menu = await prisma.menu.findUnique({
@@ -129,7 +153,9 @@ exports.createPesanan = async (userId, locationId, items) => {
       user_id: userId,
       status: "pending",
       location_id: locationId,
+      location_id: locationId,
       pesanan_items: { create: pesananItemsData },
+      address: address ?? null,
     },
     include: { pesanan_items: true },
   });
@@ -171,6 +197,9 @@ exports.getPesananAdmin = async (status, created_at, user_id, location_id) => {
     include: {
       users: {
         select: { first_name: true, last_name: true, phone: true, email: true },
+      },
+      location: {
+        select: { address: true },
       },
       location: {
         select: { address: true },
