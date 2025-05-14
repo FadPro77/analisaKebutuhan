@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const userRepository = require("../repositories/users");
 const { imageUpload } = require("../utils/image-kit");
 const { Unauthorized } = require("../utils/request");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 exports.register = async (data) => {
   // create user
@@ -85,4 +87,13 @@ exports.googleLogin = async (accessToken) => {
   delete user.password;
 
   return { user, token };
+};
+
+exports.getProfile = async (userId) => {
+  return prisma.users.findUnique({
+    where: { id: userId },
+    include: {
+      location: true, // Menyertakan data lokasi
+    },
+  });
 };

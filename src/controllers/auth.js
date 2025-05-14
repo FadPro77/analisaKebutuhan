@@ -13,11 +13,25 @@ exports.login = async (req, res, next) => {
 };
 
 exports.getProfile = async (req, res, next) => {
-  const data = req.user;
+  try {
+    const userId = req.user.id;
 
-  delete data.password;
+    // Ambil user dari database dengan relasi location
+    const user = await authService.getProfile(userId);
 
-  successResponse(res, data);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Hilangkan password sebelum dikirim ke client
+    const { password, ...safeUser } = user;
+
+    successResponse(res, safeUser);
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.changeUserRole = async (req, res) => {
