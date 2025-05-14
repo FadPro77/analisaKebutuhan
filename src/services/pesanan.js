@@ -47,7 +47,7 @@ exports.getPesananById = async (id) => {
 };
 
 exports.createPesanan = async (data) => {
-  const { user_id, location_id, pesanan_items } = data;
+  const { user_id, location_id, pesanan_items, address } = data;
 
   if (
     !pesanan_items ||
@@ -57,7 +57,12 @@ exports.createPesanan = async (data) => {
     throw new Error("Pesanan harus memiliki minimal satu item.");
   }
 
-  return pesananRepository.createPesanan(user_id, location_id, pesanan_items);
+  return pesananRepository.createPesanan(
+    user_id,
+    location_id,
+    pesanan_items,
+    address
+  );
 };
 
 exports.updatePesananStatus = async (id, status) => {
