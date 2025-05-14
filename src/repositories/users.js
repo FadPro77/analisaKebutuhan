@@ -76,9 +76,15 @@ exports.googleLogin = async (accessToken) => {
   return response?.data;
 };
 
-exports.getUser = async (first_name, last_name, email, phone) => {
+exports.getUser = async (first_name, last_name, email, phone, location) => {
   let query = {
-    where: {},
+    include: {
+      location: {
+        select: {
+          address: true, // ambil hanya address dari relasi location
+        },
+      },
+    },
   };
 
   let orQuery = [];
@@ -113,6 +119,7 @@ exports.getUser = async (first_name, last_name, email, phone) => {
     };
   }
 
+  // Query prisma
   const searchedUser = await prisma.users.findMany(query);
 
   const serializedUser = JSONBigInt.stringify(searchedUser);
