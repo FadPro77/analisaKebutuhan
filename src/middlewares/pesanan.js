@@ -39,9 +39,17 @@ exports.validateCreatePesanan = (req, res, next) => {
       .number()
       .int()
       .positive("Jumlah harus berupa angka positif"),
+    jumlah: z.coerce
+      .number()
+      .int()
+      .positive("Jumlah harus berupa angka positif"),
   });
 
   const validateBody = z.object({
+    location_id: z.coerce
+      .number()
+      .int()
+      .positive("Location ID harus berupa angka positif"),
     location_id: z.coerce
       .number()
       .int()

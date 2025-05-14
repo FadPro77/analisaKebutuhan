@@ -24,6 +24,11 @@ exports.getPesanan = async (
           address: true,
         },
       },
+      location: {
+        select: {
+          address: true,
+        },
+      },
       pesanan_items: {
         select: {
           jumlah: true,
@@ -63,6 +68,10 @@ exports.getPesanan = async (
     query.where = { location_id };
   }
 
+  if (location_id) {
+    query.where = { location_id };
+  }
+
   const searchedPesanan = await prisma.pesanan.findMany(query);
 
   return JSONBigInt.parse(JSONBigInt.stringify(searchedPesanan));
@@ -77,6 +86,11 @@ exports.getPesananById = async (id) => {
           first_name: true,
           last_name: true,
           phone: true,
+        },
+      },
+      location: {
+        select: {
+          address: true,
         },
       },
       location: {
@@ -139,6 +153,7 @@ exports.createPesanan = async (userId, locationId, items, address) => {
       user_id: userId,
       status: "pending",
       location_id: locationId,
+      location_id: locationId,
       pesanan_items: { create: pesananItemsData },
       address: address ?? null,
     },
@@ -182,6 +197,9 @@ exports.getPesananAdmin = async (status, created_at, user_id, location_id) => {
     include: {
       users: {
         select: { first_name: true, last_name: true, phone: true, email: true },
+      },
+      location: {
+        select: { address: true },
       },
       location: {
         select: { address: true },
