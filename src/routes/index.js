@@ -8,6 +8,7 @@ const pengeluaranRouter = require("./pengeluaran");
 const saldoRouter = require("./saldo");
 const userRouter = require("./user");
 const adminRouter = require("./admin");
+const locationRouter = require("./location");
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.use("/pengeluaran", pengeluaranRouter);
 router.use("/saldo", saldoRouter);
 router.use("/user", userRouter);
 router.use("/admin", adminRouter);
+router.use("/location", locationRouter);
 
 module.exports = router;
