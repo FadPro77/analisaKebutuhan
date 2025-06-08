@@ -61,6 +61,25 @@ exports.validateRegister = (req, res, next) => {
   next();
 };
 
+exports.validateUpdateUser = (req, res, next) => {
+  // Validation body schema
+  const validateBody = z.object({
+    first_name: z.string(),
+    last_name: z.string(),
+    email: z.string().email(),
+    phone: z.string(),
+  });
+
+  // Validate
+  const resultValidateBody = validateBody.safeParse(req.body);
+  if (!resultValidateBody.success) {
+    // If validation fails, return error messages
+    throw new BadRequestError(resultValidateBody.error.errors);
+  }
+
+  next();
+};
+
 exports.validateLogin = (req, res, next) => {
   // Validation body schema
   const validateBody = z.object({

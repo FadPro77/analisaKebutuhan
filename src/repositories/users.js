@@ -20,6 +20,20 @@ exports.createUser = async (data) => {
   return JSONBigInt.parse(serializedUser);
 };
 
+exports.updateUser = async (id, data) => {
+  // update the user
+  const updatedUser = await prisma.users.update({
+    where: {
+      id: Number(id),
+    },
+    data,
+  });
+
+  // Convert BigInt fields to string for safe serialization
+  const serializedUser = JSONBigInt.stringify(updatedUser);
+  return JSONBigInt.parse(serializedUser);
+};
+
 exports.getUserByEmail = async (email) => {
   const user = await prisma.users.findFirst({
     where: {

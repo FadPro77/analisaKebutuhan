@@ -7,6 +7,13 @@ exports.register = async (req, res, next) => {
   successResponse(res, data);
 };
 
+exports.updateUser = async (req, res, next) => {
+  const { id } = req.params;
+  const data = req.body;
+  const result = await authService.updateUser(id, data);
+  successResponse(res, data);
+};
+
 exports.login = async (req, res, next) => {
   const data = await authService.login(req.body.email, req.body.password);
   successResponse(res, data);

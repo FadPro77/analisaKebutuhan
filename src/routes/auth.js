@@ -5,6 +5,7 @@ const {
   authorization,
   validateAdmin,
   validateGoogleLogin,
+  validateUpdateUser,
 } = require("../middlewares/auth");
 const {
   register,
@@ -12,6 +13,7 @@ const {
   getProfile,
   googleLogin,
   changeUserRole,
+  updateUser,
 } = require("../controllers/auth");
 const { adminRole, userRole } = require("../constant/auth");
 
@@ -27,5 +29,8 @@ router.put(
   validateAdmin,
   changeUserRole
 );
+router
+  .route("/:id")
+  .put(authorization(adminRole, userRole), validateUpdateUser, updateUser);
 
 module.exports = router;

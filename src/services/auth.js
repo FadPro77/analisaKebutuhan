@@ -23,6 +23,19 @@ exports.register = async (data) => {
   };
 };
 
+exports.updateUser = async (id, data) => {
+  // create user
+  const user = await userRepository.updateUser(id, data);
+
+  // don't forget to remove the password object, if not removed it will be displayed in response
+  delete user.password;
+
+  // return the user info and the token
+  return {
+    user,
+  };
+};
+
 exports.login = async (email, password) => {
   // get user by email
   const user = await userRepository.getUserByEmail(email);
